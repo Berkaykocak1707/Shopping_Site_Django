@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Shopping Index
+{% endblock title %} 
+
+{% load static %} 
+
+{% block content %}
+<!-- Product section-->
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6">
+                <img class="card-img-top mb-5 mb-md-0" src="{{ product.image.url }}" alt="{{ product.name }}" />
+            </div>
+            <div class="col-md-6">
+                <div class="small mb-1">SKU: {{ product.special_code }}</div>
+                <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
+                <div class="fs-5 mb-5">
+                    {% if product.old_price %}
+                        <span class="text-decoration-line-through">${{ product.old_price }}</span>
+                    {% endif %}
+                    <span>${{ product.price }}</span>
+                </div>
+                <p class="lead">{{ product.description }}</p>
+                <div class="d-flex">
+                    <!-- Note: You might want to integrate a real cart system here -->
+                    <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+                    <button class="btn btn-outline-dark flex-shrink-0" type="button" onclick="addToCart()">
+                        <i class="bi-cart-fill me-1"></i>
+                        Add to cart
+                    </button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Related items section-->
+<section class="py-5 bg-light">
+    <div class="container px-4 px-lg-5 mt-5">
+        <h2 class="fw-bolder mb-4">Related products</h2>
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for related_product in related_products %}
+                <div class="col mb-5">
+                    <div class="card h-100">
+                        <!-- Optional: Sale badge-->
+                        {% if related_product.on_sale %}
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+                        {% endif %}
+                        <!-- Product image-->
+                        <img class="card-img-top" src="{{ related_product.image.url }}" alt="{{ related_product.name }}" />
+                        <!-- Product details-->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name-->
+                                <h5 class="fw-bolder">{{ related_product.name }}</h5>
+                                <!-- Product price-->
+                                {% if related_product.old_price %}
+                                    <span class="text-muted text-decoration-line-through">${{ related_product.old_price }}</span>
+                                {% endif %}
+                                <span>${{ related_product.price }}</span>
+                            </div>
+                        </div>
+                        <!-- Product actions-->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{% url 'product-detail' related_product.slug %}">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+{% block script %}
+<script>
+    function addToCart() {
+        const productId = "{{ product.id }}";  
+        const quantity = document.getElementById("inputQuantity").value;
+    
+        fetch('/add-to-cart/', {
+            method: 'POST',
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'  // Django CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  // Burada sunucudan dönen yanıtı konsola yazdırıyoruz.
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+</script>    
+
+{% endblock script %}
+
+

@@ -1,0 +1,87 @@
+<div class="modal-body">
+    <h5>Cart Contents</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Action</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart_items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.price }}$</td>
+            <td>
+                <button class="decrease" onclick="decreaseQuantity({{ item.id }})">-</button>
+                {{ item.quantity }} pcs
+                <button class="increase" onclick="increaseQuantity({{ item.id }})">+</button>
+            </td>
+            <td><button class="remove" onclick="removeFromCart({{ item.id }})">Remove</button></td>
+            <td>{{ item.subtotal }}$</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeCartModal();">Kapat</button>
+</div>
+{% block script %}
+    <script>
+        function openCartModal() {
+            $('#cartModal').modal('show'); // Bootstrap modalı açmak için gerekli kod
+            }
+
+        function closeCartModal() {
+                $('#cartModal').modal('hide'); // Bootstrap modalı kapatmak için gerekli kod
+        }
+        function increaseQuantity(itemId) {
+            updateQuantity(itemId, 'increase');
+        }
+        
+        function decreaseQuantity(itemId) {
+            updateQuantity(itemId, 'decrease');
+        }
+        
+        function removeFromCart(itemId) {
+            fetch(`/remove-from-cart/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+        
+        function updateQuantity(itemId, action) {
+            fetch(`/update-quantity/${itemId}/${action}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+    </script>
+{% endblock script %}
