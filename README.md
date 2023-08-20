@@ -20,9 +20,15 @@ ShoppingSite is a Django-based e-commerce platform that offers users the ability
     - Remove products from the cart.
     - Ensure inactive products are flagged and prevented from being added to the cart.
 
-### Installation and Setup
+### Installation
 
-(Here, you can provide instructions on how to set up and run the project locally. Include steps on setting up any dependencies, database configurations, and any other necessary setup.)
+1. Clone this repo to your local machine.
+2. Create and activate a virtual environment in the directory where the project is located.
+3. Run the command `pip install -r requirements.txt` to install the dependencies listed in the `requirements.txt` file.
+4. Adjust your email settings in the `settings.py` file.
+5. Adjust the email sending functions in the `views.py` file.
+6. Run the command `python manage.py migrate` to create the database.
+7. Start the server with the command `python manage.py runserver`.
 
 ### Contribution
 
